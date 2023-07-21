@@ -20,8 +20,6 @@ public class User {
     private LocalDate birthDate;
     private String password;
 
-
-
     @OneToMany(mappedBy = "client")
     List<Order> orders = new ArrayList<>();
 
