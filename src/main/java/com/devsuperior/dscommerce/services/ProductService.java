@@ -1,15 +1,15 @@
-package com.devsuperior.dscommerce.controllers.services;
+package com.devsuperior.dscommerce.services;
 
 import com.devsuperior.dscommerce.dto.ProductDTO;
 import com.devsuperior.dscommerce.entities.Product;
 import com.devsuperior.dscommerce.repositories.ProductRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class ProductService {
@@ -32,15 +32,33 @@ public class ProductService {
     public ProductDTO insert(ProductDTO productDTO) {
 
         Product product = new Product();
+        copyDTOtoEntity(productDTO, product);
+        return new ProductDTO(productRepository.save(product));
+
+    }
+
+    @Transactional
+    public ProductDTO updateById (Long id, ProductDTO productDTO){
+
+        Product product = productRepository.getReferenceById(id);
+        copyDTOtoEntity(productDTO, product);
+        return new ProductDTO(productRepository.save(product));
+
+    }
+
+    @Transactional
+    public void delete (Long id) {
+        productRepository.deleteById(id);
+
+    }
+
+    private void copyDTOtoEntity(ProductDTO productDTO, Product product){
+
         product.setName(productDTO.getName());
         product.setDescription(productDTO.getDescription());
         product.setImgUrl(productDTO.getImgUrl());
         product.setPrice(productDTO.getPrice());
 
-        return new ProductDTO(productRepository.save(product));
-
     }
-
-
 
 }

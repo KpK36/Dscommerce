@@ -1,9 +1,11 @@
 package com.devsuperior.dscommerce.controllers;
 
-import com.devsuperior.dscommerce.controllers.services.ProductService;
-import com.devsuperior.dscommerce.dto.ProductDTO;
+
 import com.devsuperior.dscommerce.entities.Product;
-import com.devsuperior.dscommerce.repositories.ProductRepository;
+import com.devsuperior.dscommerce.services.ProductService;
+import com.devsuperior.dscommerce.dto.ProductDTO;
+
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,15 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/products")
 public class ProductController {
-
-    @Autowired
-    ProductRepository productRepository;
 
     @Autowired
     ProductService productService;
@@ -41,6 +38,22 @@ public class ProductController {
                 .buildAndExpand(productDTO.getId()).toUri();
 
         return ResponseEntity.created(uri).body(productService.insert(productDTO));
+
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductDTO> update (@RequestBody ProductDTO productDTO,
+                                              @PathVariable Long id){
+
+        return ResponseEntity.ok(productService.updateById(id, productDTO));
+
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id){
+
+        productService.delete(id);
+        return ResponseEntity.noContent().build();
 
     }
 
