@@ -3,6 +3,7 @@ package com.devsuperior.dscommerce.services;
 import com.devsuperior.dscommerce.dto.ProductDTO;
 import com.devsuperior.dscommerce.entities.Product;
 import com.devsuperior.dscommerce.repositories.ProductRepository;
+import com.devsuperior.dscommerce.services.exceptions.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,7 +20,9 @@ public class ProductService {
 
     @Transactional
     public ProductDTO findById (Long id) {
-        return new ProductDTO(productRepository.findById(id).get());
+
+        return new ProductDTO(productRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Recurso não encontrado")));
 
     }
     @Transactional
