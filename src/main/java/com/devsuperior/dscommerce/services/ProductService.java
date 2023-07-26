@@ -4,6 +4,7 @@ import com.devsuperior.dscommerce.dto.ProductDTO;
 import com.devsuperior.dscommerce.entities.Product;
 import com.devsuperior.dscommerce.repositories.ProductRepository;
 import com.devsuperior.dscommerce.services.exceptions.ResourceNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,12 +20,13 @@ public class ProductService {
     ProductRepository productRepository;
 
     @Transactional
-    public ProductDTO findById (Long id) {
+    public ProductDTO findById(Long id) {
 
         return new ProductDTO(productRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Recurso não encontrado")));
 
     }
+
     @Transactional
     public Page<ProductDTO> findAll(Pageable pageable) {
         return productRepository.findAll(pageable).map(product -> new ProductDTO(product));
@@ -41,21 +43,26 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductDTO updateById (Long id, ProductDTO productDTO){
+    public ProductDTO updateById(Long id, ProductDTO productDTO) {
 
-        Product product = productRepository.getReferenceById(id);
-        copyDTOtoEntity(productDTO, product);
-        return new ProductDTO(productRepository.save(product));
+        try {
+
+            Product product = productRepository.getReferenceById(id);
+            copyDTOtoEntity(productDTO, product);
+            return new ProductDTO(productRepository.save(product));
+        } catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException("Recurso não encontrado");
+        }
 
     }
 
     @Transactional
-    public void delete (Long id) {
+    public void delete(Long id) {
         productRepository.deleteById(id);
 
     }
 
-    private void copyDTOtoEntity(ProductDTO productDTO, Product product){
+    private void copyDTOtoEntity(ProductDTO productDTO, Product product) {
 
         product.setName(productDTO.getName());
         product.setDescription(productDTO.getDescription());
